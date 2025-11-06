@@ -26,12 +26,21 @@ def get_device_name():
 DEVICE = get_device_name()
 
 def run_preprocess_and_upsert():
-    sample_size = 1000
+    def valid_rows(rows, min_len=20):
+        for r in rows:
+            descr = (r.get("overview") or "").strip()
+            if len(descr) >= min_len:
+                yield r
+
+    sample_size = 2000
     batch_size = 64
     
     print(f"Loading dataset ({sample_size} samples): {DS_NAME}")
     stream = load_dataset(DS_NAME, split="train", streaming=True)
-    sample = list(islice(stream, sample_size))
+
+    filtered_stream = valid_rows(stream, min_len=20)
+    
+    sample = list(islice(filtered_stream, sample_size))
     
     movie_ds = Dataset.from_list(sample)
     movie_ds = movie_ds.select_columns(["id", "image", "title", "genres", "overview"])

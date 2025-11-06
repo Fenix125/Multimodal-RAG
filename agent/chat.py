@@ -3,7 +3,7 @@ from agent.config import CFG
 import uuid
 
 def chat():
-    session_id = f"cli:{uuid.uuid4()}" 
+    session_id = f"cli:{uuid.uuid4()}"
     print("Building agent...")
     agent = build_agent()
     print("Multimodal Movie Search Agent ready.\n")
@@ -15,11 +15,11 @@ def chat():
         if prompt == "exit":
             print("bye!")
             break
-        config = {"configurable": {"thread_id": session_id}}
-        result = agent.invoke({"messages": prompt}, config)
-        final_message = result["messages"][-1]
-        print(f"> {final_message.content}")
-
+        res = agent.invoke(
+            {"input": prompt},
+            config={"configurable": {"session_id": session_id}},
+        )
+        print(res["output"])
 
 if __name__ == "__main__":
     chat()

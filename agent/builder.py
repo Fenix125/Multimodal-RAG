@@ -3,10 +3,7 @@ from langchain_core.tools import tool
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.chat_history import InMemoryChatMessageHistory, BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
-
-from langchain.agents import create_agent
-from langgraph.checkpoint.memory import MemorySaver
-from langchain.tools import tool
+from langchain.agents import create_tool_calling_agent, AgentExecutor
 
 from agent.config import CFG
 from agent.prompt import SYSTEM_PROMPT
@@ -16,8 +13,7 @@ from PIL import Image
 from agent.vector_store import index_handle
 
 
-checkpointer = MemorySaver()
-
+HISTORY_STORE = {}
 
 def format_record(data):
     md = data.get("metadata")
@@ -131,17 +127,40 @@ def search_text_by_image(image_path: str) -> str:
 
 
 def build_agent():
+    def get_history(session_id: str) -> BaseChatMessageHistory:
+        if session_id not in HISTORY_STORE:
+            HISTORY_STORE[session_id] = InMemoryChatMessageHistory()
+        return HISTORY_STORE[session_id]
+
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", SYSTEM_PROMPT),
+            MessagesPlaceholder("chat_history"),
+            ("human", "{input}"),
+            MessagesPlaceholder("agent_scratchpad"),
+        ]
+    )
     llm = ChatGoogleGenerativeAI(
         model="gemini-2.5-flash",
         temperature=0.2,
         api_key=CFG.google_api_key,
     )
-    agent = create_agent(
-        model=llm,
-        tools=[search_text_by_query, search_posters_by_query, search_posters_by_image, search_text_by_image],
-        system_prompt=SYSTEM_PROMPT,
-        checkpointer=checkpointer,
-        debug=True
+
+    tools = [search_text_by_query, search_posters_by_query, search_posters_by_image, search_text_by_image]
+    agent = create_tool_calling_agent(llm, tools, prompt)
+
+    agent_executor = AgentExecutor(
+        agent=agent,
+        tools=tools,
+        verbose=True,
+        return_intermediate_steps=True
     )
-    return agent
+    agent_executor_history = RunnableWithMessageHistory(
+        agent_executor,
+        get_history,
+        input_messages_key="input",
+        history_messages_key="chat_history",
+        output_messages_key="output"
+    )
+    return agent_executor_history
 
