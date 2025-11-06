@@ -1,17 +1,20 @@
 import torch
 import numpy as np
 from itertools import islice
-from transformers import CLIPProcessor, CLIPModel
 from datasets import load_dataset, Dataset
-from agent.config import CFG
 from agent.vector_store import (
     NAMESPACE_POSTER,
     NAMESPACE_TEXT,
     ensure_index,
     batch_upsert,
 )
+from agent.model import clip, text_embedding, img_embedding
+from pathlib import Path
 
 DS_NAME = "stzhao/movie_posters_100k_controlnet"
+
+POSTERS_DIR = Path("data/posters")
+POSTERS_DIR.mkdir(parents=True, exist_ok=True)
 
 def get_device_name():
     if torch.cuda.is_available():
@@ -21,32 +24,6 @@ def get_device_name():
     return "cpu"
 
 DEVICE = get_device_name()
-
-
-def clip():
-    model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").to(DEVICE)
-    processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
-    model.eval()
-    return model, processor
-
-def text_embedding(model, processor, texts, batch_size=64):
-    out = []
-    for i in range(0, len(texts), batch_size):
-        batch = texts[i:i+batch_size]
-        tokens = processor(text=batch, images=None, padding=True, truncation=True, return_tensors="pt").to(DEVICE)
-        text_emb = model.get_text_features(**tokens)
-        out.append(text_emb.detach().cpu().numpy())
-    return np.vstack(out)
-
-def img_embedding(model, processor, imgs, batch_size=64):
-    out = []
-    for i in range(0, len(imgs), batch_size):
-        batch = imgs[i:i+batch_size]
-        tokens = processor(images=batch, text=None, return_tensors="pt").to(DEVICE)
-        img_emb = model.get_image_features(**tokens)
-        out.append(img_emb.detach().cpu().numpy())
-    return np.vstack(out)
-
 
 def run_preprocess_and_upsert():
     sample_size = 1000
@@ -60,10 +37,15 @@ def run_preprocess_and_upsert():
     movie_ds = movie_ds.select_columns(["id", "image", "title", "genres", "overview"])
 
     ids = [str(row["id"]) for row in movie_ds]
-
     texts = [row["overview"] for row in movie_ds]
     posters = [row["image"] for row in movie_ds]
     
+    poster_paths = []
+    for i, pid in enumerate(ids):
+        out_path = POSTERS_DIR / f"{pid}.jpg"
+        if not out_path.exists():
+            posters[i].save(out_path, format="JPEG", quality=100)
+        poster_paths.append(str(out_path))
 
     print("Loading CLIP model")
     model, processor = clip()
@@ -74,9 +56,10 @@ def run_preprocess_and_upsert():
     print("Computing image embeddings")
     img_vecs = img_embedding(model, processor, posters, batch_size)
 
-    metadata = []
+    text_metadata = []
+    img_metadata = []
     for i in range(len(ids)):
-        metadata.append(
+        text_metadata.append(
             {
                 "id": ids[i],
                 "title": movie_ds[i]["title"],
@@ -84,17 +67,21 @@ def run_preprocess_and_upsert():
                 "overview": movie_ds[i]["overview"],
             }
         )
+        img_metadata.append(
+            {
+                "id": ids[i],
+                "poster_path": poster_paths[i],
+            }
+        )
     
-    text_payload = [
-        (ids[i], text_vecs[i].tolist(), metadata[i])
-        for i in range(len(ids))
-    ]
-    batch_upsert(text_payload, namespace=NAMESPACE_TEXT, batch_size=batch_size)
+    text_payload = []
+    img_payload = []
 
-    img_payload = [
-        (ids[i], img_vecs[i].tolist(), metadata[i])
-        for i in range(len(ids))
-    ]
+    for i in range(len(ids)):
+        text_payload.append((ids[i], text_vecs[i].tolist(), text_metadata[i]))
+        img_payload.append((ids[i], img_vecs[i].tolist(), img_metadata[i]))
+
+    batch_upsert(text_payload, namespace=NAMESPACE_TEXT, batch_size=batch_size)
     batch_upsert(img_payload, namespace=NAMESPACE_POSTER, batch_size=batch_size)
 
     print("Done upserting vector store")

@@ -1,10 +1,10 @@
-from agent.config import CFG
 from pinecone import Pinecone, ServerlessSpec
+from agent.config import CFG
 
 
 INDEX_NAME = "movie-store"
 
-NAMESPACE_POSTER = "poster"
+NAMESPACE_POSTER = "posters"
 NAMESPACE_TEXT = "movie-info"
 
 class PC:
@@ -48,7 +48,7 @@ def batch_upsert(vectors, namespace, batch_size = 64) -> None:
         idx.upsert(vectors=chunk, namespace=namespace)
 
 
-def query(vector, namespace, top_k = 3):
+def query(vector, namespace, top_k= 3):
     idx = index_handle()
     return idx.query(
         vector=vector,
