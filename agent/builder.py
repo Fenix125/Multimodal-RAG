@@ -69,12 +69,11 @@ def search_posters_by_query(query_text: str) -> str:
 
     movies_text_data = index.fetch(
         ids=[it["metadata"]["id"] for it in items],
-        namespace=NAMESPACE_TEXT
+        namespace=NAMESPACE_TEXT,
     )
-
     movie_info = []
     for item_id, item_obj in movies_text_data.vectors.items():
-        movie_info.append(format_record(item_obj.metadata))
+        movie_info.append(format_record(item_obj.to_dict()))
 
     return f"\n{30*"-"}\n".join(movie_info)
 
@@ -104,7 +103,7 @@ def search_posters_by_image(image_path: str) -> str:
 
     movie_info = []
     for item_id, item_obj in movies_text_data.vectors.items():
-        movie_info.append(format_record(item_obj.metadata))
+        movie_info.append(format_record(item_obj.to_dict()))
 
     return f"\n{30*"-"}\n".join(movie_info)
 

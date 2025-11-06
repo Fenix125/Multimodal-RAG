@@ -94,6 +94,7 @@ def run_preprocess_and_upsert():
     batch_upsert(img_payload, namespace=NAMESPACE_POSTER, batch_size=batch_size)
 
     print("Done upserting vector store")
+    return
 
 
 ensure_index()
