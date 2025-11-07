@@ -12,7 +12,6 @@ from agent.model import clip, text_embedding, img_embedding
 from PIL import Image
 from agent.vector_store import index_handle
 
-
 HISTORY_STORE = {}
 
 def format_record(data):
@@ -44,11 +43,14 @@ def search_text_by_query(query_text: str) -> str:
     poster_paths = []
     for poster_id, poster_obj in res.vectors.items():
         poster_paths.append(poster_obj["metadata"]["poster_path"])
+    return "\n" + ("\n" + 30*"-" + "\n").join(format_record(item) for item in items)
 
-    return f"\n{30*"-"}\n".join(format_record(item) for item in items)
+    return {
+            "text": "\n" + ("\n" + 30*"-" + "\n").join(movie_info),
+            "posters": poster_paths
+        }
 
-
-@tool("search_posters_by_query")
+@tool("search_posters_by_query", return_direct=True)
 def search_posters_by_query(query_text: str) -> str:
     """
     Searches the poster in a movie's poster vector database that are similar to user's text query
@@ -58,26 +60,26 @@ def search_posters_by_query(query_text: str) -> str:
     model, processor = clip()
     vec = text_embedding(model, processor, [query_text], batch_size=1)[0]
     res = query(vec.tolist(), namespace=NAMESPACE_POSTER, top_k=3)
-    
     items = res.matches or []
     if not items:
         return "No results"
-    
     poster_paths = [it["metadata"]["poster_path"] for it in items]
-
     index = index_handle()
-
     movies_text_data = index.fetch(
         ids=[it["metadata"]["id"] for it in items],
         namespace=NAMESPACE_TEXT,
     )
     movie_info = []
     for item_id, item_obj in movies_text_data.vectors.items():
-        movie_info.append(format_record(item_obj.to_dict()))
+        movie_info.append(format_record(item_obj.to_dict()))    
+    return {
+        "text": "\n" + ("\n" + 30*"-" + "\n").join(movie_info),
+        "posters": poster_paths
+    }
 
-    return f"\n{30*"-"}\n".join(movie_info)
 
-@tool("search_posters_by_image", return_direct=False)
+
+@tool("search_posters_by_image", return_direct=True)
 def search_posters_by_image(image_path: str) -> str:
     """
     Searches the poster in a movie's poster vector database that are similar to user's provided poster/image
@@ -105,9 +107,13 @@ def search_posters_by_image(image_path: str) -> str:
     for item_id, item_obj in movies_text_data.vectors.items():
         movie_info.append(format_record(item_obj.to_dict()))
 
-    return f"\n{30*"-"}\n".join(movie_info)
+    return {
+            "text": "\n" + ("\n" + 30*"-" + "\n").join(movie_info),
+            "posters": poster_paths
+    }
+    # return f"\n{30*"-"}\n".join(movie_info)
 
-@tool("search_text_by_image")
+@tool("search_text_by_image", return_direct=True)
 def search_text_by_image(image_path: str) -> str:
     """
     Searches the movie information in a movie's description vector database that are similar to user's provided poster/image
