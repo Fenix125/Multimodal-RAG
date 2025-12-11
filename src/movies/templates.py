@@ -7,4 +7,5 @@ class Movie(BaseModel):
     title: str
     genres: List[str]
     overview: str
-    poster_path: Optional[str] = None
+    poster_url: Optional[str] = None
+    release_date: Optional[str] = None

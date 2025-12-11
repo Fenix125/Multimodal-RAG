@@ -9,50 +9,53 @@ from PIL import Image
 
 from src.movies.templates import Movie
 
-DS_NAME = "stzhao/movie_posters_100k_controlnet"
+DS_NAME = "Pablinho/movies-dataset"
 
-POSTERS_DIR = Path("data/posters")
-POSTERS_DIR.mkdir(parents=True, exist_ok=True)
-
+PROCESSED_DIR = Path("data/processed")
+PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
 def valid_rows(stream: Iterable[dict], min_len: int = 20) -> Iterable[dict]:
     """
     Filter out movies with very short or empty overviews.
     """
     for row in stream:
-        overview = (row.get("overview") or "").strip()
+        overview = (row.get("Overview") or "").strip()
         if len(overview) >= min_len:
             yield row
 
 
-def build_movie_from_row(row: dict) -> Movie:
+def parse_genres(genre_raw: str) -> List[str]:
+    if not genre_raw or not isinstance(genre_raw, str):
+        return []
+    return [g.strip() for g in genre_raw.split(",") if g.strip()]
+
+
+def build_movie_from_row(idx: int, row: dict) -> Movie:
     """
-    Builds Movie, if None occurs in one of metadatas returns (False, None), else (True, Movie)
+    Build a Movie object from a raw dataset row.
+    Uses idx as a stable movie_id (cast to string).
     """
-    movie_id = str(row["id"])
-    title = (row.get("title") or "").strip() or "(untitled)"
-    genres_raw = row.get("genres") or []
-    genres = [g.get("name") for g in genres_raw if isinstance(g, dict) and g.get("name")]
+    movie_id = str(idx)
 
-    overview = (row.get("overview") or "").strip()
+    title = (row.get("Title") or "").strip() or "(untitled)"
+    overview = (row.get("Overview") or "").strip()
 
-    img = row.get("image")
-    poster_path = None
-    if isinstance(img, Image.Image):
-        out_path = POSTERS_DIR / f"{movie_id}.jpg"
-        if not out_path.exists():
-            img.save(out_path, format="JPEG", quality=95)
-        poster_path = str(out_path)
+    genres = parse_genres(row.get("Genre"))
 
-    if not (movie_id and title and genres and overview and poster_path):
+    poster_url = (row.get("Poster_Url") or "").strip() or None
+
+    release_date = (row.get("Release_Date") or "").strip() or None
+
+    if not (movie_id and title and overview and genres and poster_url and release_date):
         return False, None
 
     return True, Movie(
         movie_id=movie_id,
         title=title,
-        genres=genres,
         overview=overview,
-        poster_path=poster_path,
+        genres=genres,
+        poster_url=poster_url,
+        release_date=release_date
     )
 
 
@@ -67,7 +70,7 @@ def ingest_movies_to_jsonl(output_path: Path, sample_size: int = 3000, min_overv
         "title": "...",
         "genres": ["..."],
         "overview": "...",
-        "poster_path": "data/posters/<id>.jpg"
+        "poster_url": "https://...",
       }
     """
     print(f"[INFO] Loading dataset: {DS_NAME}")
@@ -78,8 +81,8 @@ def ingest_movies_to_jsonl(output_path: Path, sample_size: int = 3000, min_overv
 
     print(f"[INFO] Building Movie objects for {len(sample)} rows")
     movies: List[Movie] = []
-    for row in sample:
-        success, movie = build_movie_from_row(row)
+    for idx, row in enumerate(sample):
+        success, movie = build_movie_from_row(idx, row)
         if success:
             movies.append(movie)
 

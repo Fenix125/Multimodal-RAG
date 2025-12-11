@@ -1,12 +1,11 @@
 from __future__ import annotations
+from dataclasses import dataclass
 
-from typing import Dict
+from langchain.agents import create_agent
+from langgraph.checkpoint.memory import InMemorySaver
 
-from langchain.agents import AgentExecutor, create_tool_calling_agent
-from langchain_core.chat_history import InMemoryChatMessageHistory, BaseChatMessageHistory
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 
 from src.config import config
 from src.embeddings.text_embedder import TextEmbedder
@@ -15,21 +14,54 @@ from src.vector_db.movie_chroma_store import MovieChromaIndexer
 from src.agent.prompt import SYSTEM_PROMPT
 from src.agent.tools import make_multimodal_search_tool, make_image_search_tool
 
-HISTORY_STORE: Dict[str, InMemoryChatMessageHistory] = {}
 
 
-def get_history(session_id: str) -> BaseChatMessageHistory:
-    if session_id not in HISTORY_STORE:
-        HISTORY_STORE[session_id] = InMemoryChatMessageHistory()
-    return HISTORY_STORE[session_id]
+@dataclass
+class Context:
+    session_id: str
 
 
-def build_movie_agent() -> RunnableWithMessageHistory:
+def build_llm():
+    """
+    Choose LLM based on config:
+      - OpenAI if OPENAI_MODEL is set
+      - otherwise Gemini if GEMINI_MODEL is set
+    """
+    provider = config.llm_provider
+    model_name = config.llm_model_name
+
+    if provider is None or model_name is None:
+        raise RuntimeError(
+            "No LLM configured. Set either OPENAI_MODEL or GEMINI_MODEL in your .env"
+        )
+
+    if provider == "openai":
+        if not config.openai_api_key:
+            raise RuntimeError("OPENAI_API_KEY is not set.")
+        return ChatOpenAI(
+            model=model_name,
+            api_key=config.openai_api_key,
+            temperature=0.4,
+        )
+
+    if provider == "google":
+        if not config.google_ai_api_key:
+            raise RuntimeError("GOOGLE_AI_API_KEY is not set.")
+        return ChatGoogleGenerativeAI(
+            model=model_name,
+            google_api_key=config.google_ai_api_key,
+            temperature=0.4,
+        )
+
+    raise RuntimeError(f"Unknown LLM provider: {provider!r}")
+
+
+
+def build_movie_agent():
     """
     Build a LangChain agent with:
       - LLM
       - MovieChromaIndexer-backed multimodal search tools
-      - Chat history via RunnableWithMessageHistory
     """
     text_embedder = TextEmbedder(
         model_name=config.text_embed_model_name,
@@ -48,36 +80,13 @@ def build_movie_agent() -> RunnableWithMessageHistory:
         make_multimodal_search_tool(indexer),
         make_image_search_tool(indexer),
     ]
-
-    llm = ChatGoogleGenerativeAI(
-        model=config.gemini_model_name,
-        temperature=0.2,
-        google_api_key=config.google_ai_api_key,
-    )
-
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", SYSTEM_PROMPT),
-            MessagesPlaceholder("chat_history"),
-            ("human", "{input}"),
-            MessagesPlaceholder("agent_scratchpad"),
-        ]
-    )
-
-    agent = create_tool_calling_agent(llm, tools, prompt)
-
-    agent_executor = AgentExecutor(
-        agent=agent,
+    checkpointer = InMemorySaver()
+    
+    agent = create_agent(
+        model=build_llm(),
+        system_prompt=SYSTEM_PROMPT,
         tools=tools,
-        verbose=True,
-        return_intermediate_steps=True,
+        context_schema=Context,
+        checkpointer=checkpointer,
     )
-
-    agent_with_history = RunnableWithMessageHistory(
-        agent_executor,
-        get_history,
-        input_messages_key="input",
-        history_messages_key="chat_history",
-        output_messages_key="output",
-    )
-    return agent_with_history
+    return agent

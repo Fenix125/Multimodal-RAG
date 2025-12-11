@@ -78,6 +78,7 @@ def make_multimodal_search_tool(indexer: MovieChromaIndexer):
                     "title": r.get("title"),
                     "genres": r.get("genres") or [],
                     "overview": r.get("overview"),
+                    "release_date": r.get("release_date"),
                     "sources": r.get("sources") or [],
                     "text_snippets": r.get("text_snippets") or [],
                     "image_paths": r.get("image_paths") or [],
@@ -151,10 +152,10 @@ def make_image_search_tool(indexer: MovieChromaIndexer):
             if min_dist is not None:
                 score = 1.0 / (1.0 + float(min_dist))
 
-            movie_id = meta.get("id")
+            movie_id = meta.get("movie_id")
             snippet = indexer.top_text_chunk_for_movie(movie_id)
 
-            image_path_meta = meta.get("image_path") or meta.get("image")
+            image_path_meta = meta.get("image_url") or meta.get("image")
 
             combined.append(
                 {
@@ -162,6 +163,7 @@ def make_image_search_tool(indexer: MovieChromaIndexer):
                     "title": meta.get("title") or "(untitled movie)",
                     "genres": meta.get("genres") or [],
                     "overview": meta.get("overview"),
+                    "release_date": meta.get("release_date"),
                     "sources": ["image"],
                     "text_snippets": [snippet] if snippet else [],
                     "image_paths": [image_path_meta] if image_path_meta else [],

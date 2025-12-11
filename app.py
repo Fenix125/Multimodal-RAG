@@ -3,18 +3,22 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import List, Any
 
 import streamlit as st
+from langchain_core.messages import AIMessage, ToolMessage, BaseMessage
 
-from src.agent.agent import build_movie_agent
+from src.agent.agent import build_movie_agent, Context as AgentContext
 
+DEBUG = True
 
 def run_fetch_and_ingest():
     """
     Rebuild the movie index:
       1) Download & preprocess movies into data/processed/movies.jsonl
       2) Index movies into Chroma (overviews + posters)
-    Uses the CLI scripts so it stays in sync with your pipeline.
+
+    Uses the CLI scripts so the app stays in sync with your pipeline.
     """
     try:
         with st.spinner("Step 1/2: downloading & preprocessing movies..."):
@@ -36,20 +40,22 @@ def run_fetch_and_ingest():
     st.success("Movie dataset fetched and indexed into Chroma.")
 
 
-
 def set_section(name: str):
     st.session_state.section = name
 
 
 def init_session():
     """
-    Initialize session_id and chat messages for this Streamlit session.
+    Initialize session_id, UI messages, and graph history length.
     """
     if "session_id" not in st.session_state:
         st.session_state.session_id = f"streamlit:{uuid.uuid4()}"
 
     if "messages" not in st.session_state:
-        st.session_state.messages = []
+        st.session_state.messages: List[dict] = []
+
+    if "history_len" not in st.session_state:
+        st.session_state.history_len = 0
 
 
 def init_agent():
@@ -61,32 +67,56 @@ def init_agent():
     return st.session_state.agent
 
 
-
-def extract_movies_from_intermediate_steps(intermediate_steps):
+def _normalize_tool_payload(content: Any) -> Any:
     """
-    Pulls movie results from the movie_multimodal_search / image_search tool calls.
-    Expects each tool result to be either:
-      - a JSON string with {"results": [...]} or
-      - a dict with key "results".
+    ToolMessage.content can be:
+      - dict (ideal)
+      - JSON string
+      - list of dicts (rare)
+    Normalize to a dict with at least optional 'results' key.
+    """
+    if isinstance(content, dict):
+        return content
+
+    if isinstance(content, str):
+        try:
+            data = json.loads(content)
+            return data
+        except json.JSONDecodeError:
+            return None
+
+    if isinstance(content, list) and len(content) == 1 and isinstance(content[0], dict):
+        return content[0]
+
+    return None
+
+
+def extract_movies_from_new_messages(new_messages: List[BaseMessage]) -> list:
+    """
+    Extract movie result payloads from ToolMessages produced in *this* turn.
+
+    We look for tools named like:
+      - "movie_multimodal_search"
+      - "image_search" (or similar if you reused the name)
+    and then expect a payload with a "results" list.
     """
     collected = []
 
-    for step in intermediate_steps:
-        if not isinstance(step, (list, tuple)) or len(step) != 2:
+    for msg in new_messages:
+        if not isinstance(msg, ToolMessage):
             continue
 
-        action, result = step
-        tool_name = getattr(action, "tool", None)
+        tool_name = msg.name or ""
 
-        if tool_name not in {"movie_multimodal_search", "image_search"}:
+        if tool_name not in {
+            "movie_multimodal_search",
+            "image_search",
+        }:
             continue
 
-        payload = result
-        if isinstance(payload, str):
-            try:
-                payload = json.loads(payload)
-            except json.JSONDecodeError:
-                payload = None
+        payload = _normalize_tool_payload(msg.content)
+        if not payload:
+            continue
 
         if isinstance(payload, dict):
             movies_list = payload.get("results") or []
@@ -100,17 +130,26 @@ def extract_movies_from_intermediate_steps(intermediate_steps):
     return collected
 
 
-def render_movie_card(movie):
+def render_movie_card(movie: dict):
     """
     Stylish card for a single retrieved movie / poster match.
     Shows poster + metadata + relevant snippets.
     """
     title = movie.get("title", "Untitled movie")
-    genres = movie.get("genres") or []
+
+    raw_genres = movie.get("genres") or movie.get("genres_str") or []
+    if isinstance(raw_genres, str):
+        genres = [g.strip() for g in raw_genres.split(",") if g.strip()]
+    else:
+        genres = list(raw_genres)
+
     overview = movie.get("overview") or ""
     sources = movie.get("sources", [])
     text_snippets = movie.get("text_snippets", []) or []
+    release_date = movie.get("release_date", [])
+
     image_paths = movie.get("image_paths", []) or []
+
     score = movie.get("score")
 
     meta_bits = []
@@ -118,6 +157,8 @@ def render_movie_card(movie):
         meta_bits.append("**Genres:** " + ", ".join(genres))
     if score is not None:
         meta_bits.append(f"**Score:** {score:.3f}")
+    if release_date:
+        meta_bits.append(f"**Release date:** {release_date:}")
 
     is_image_match = "image" in [s.lower() for s in sources]
     is_text_match = "text" in [s.lower() for s in sources]
@@ -152,6 +193,7 @@ def render_movie_card(movie):
 
             if meta_bits:
                 st.markdown(" • ".join(meta_bits))
+
             if text_snippets:
                 st.markdown("**Relevant description snippets:**")
                 for snippet in text_snippets:
@@ -182,7 +224,7 @@ def render_movies_section(movies, section_title: str = "Retrieved movies"):
         render_movie_card(movie)
 
 
-def render_message(msg):
+def render_message(msg: dict):
     """
     Render a single message in Streamlit's chat UI.
     """
@@ -228,7 +270,6 @@ def render_settings_section():
         if cancel:
             st.session_state.confirm_fetch = False
         st.rerun()
-
 
 def main():
     st.set_page_config(
@@ -291,7 +332,6 @@ def main():
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
                     combined_input = user_input
-                    image_path = None
 
                     if uploaded_img:
                         uploads_dir = Path("data/uploads")
@@ -305,14 +345,42 @@ def main():
                             f"[Image path]: {image_path}"
                         )
 
-                    res = agent.invoke(
-                        {"input": combined_input},
-                        config={"configurable": {"session_id": st.session_state.session_id}},
+                    state = agent.invoke(
+                        {"messages": [{"role": "user", "content": combined_input}]},
+                        config={"configurable": {"thread_id": st.session_state.session_id}},
+                        context=AgentContext(session_id=st.session_state.session_id),
                     )
 
-            output_text = res.get("output", "(no output)")
-            intermediate_steps = res.get("intermediate_steps", [])
-            movies = extract_movies_from_intermediate_steps(intermediate_steps)
+            all_messages: List[BaseMessage] = state["messages"]
+            prev_len = st.session_state.history_len
+            new_messages = all_messages[prev_len:]
+            st.session_state.history_len = len(all_messages)
+
+            ai_msg = next(
+                (m for m in reversed(new_messages) if isinstance(m, AIMessage)),
+                None,
+            )
+            output_text = ai_msg.content if ai_msg is not None else "(no output)"
+            
+            print("[ASSISTANT] > ", all_messages[-1].content)
+            print()
+            if DEBUG:
+                print("---- DEBUG: tool calls this turn ----")
+                for msg in reversed(all_messages):
+                    if getattr(msg, "type", None) == "human":
+                        break
+
+                    if isinstance(msg, AIMessage) and getattr(msg, "tool_calls", None):
+                        print("[AI] tool calls:")
+                        for tc in msg.tool_calls:
+                            print("   name:", tc.get("name"), "args:", tc.get("args"))
+
+                    if isinstance(msg, ToolMessage):
+                        print("[TOOL]", msg.name, "->", msg.content)
+                print("-------------------------------------")
+                print()
+
+            movies = extract_movies_from_new_messages(new_messages)
 
             st.session_state.messages.append(
                 {"role": "assistant", "content": output_text, "movies": movies}

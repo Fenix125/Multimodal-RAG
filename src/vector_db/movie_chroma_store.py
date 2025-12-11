@@ -24,6 +24,7 @@ class MovieChromaIndexer:
       - title
       - genres
       - overview
+      - release date
       - image       (poster_path, if any)
 
     Extra text metadata:
@@ -35,7 +36,7 @@ class MovieChromaIndexer:
       - image_path
     """
     def __init__(
-        self, text_embedder: TextEmbedder, image_embedder: ImageEmbedder, chunk_size: int = 512, chunk_overlap: int = 128) -> None:
+        self, text_embedder: TextEmbedder, image_embedder: ImageEmbedder, chunk_size: int = 1024, chunk_overlap: int = 256) -> None:
         self.client = chromadb.PersistentClient(path=config.chroma_path)
         self.text_embedder = text_embedder
         self.image_embedder = image_embedder
@@ -58,11 +59,12 @@ class MovieChromaIndexer:
     def base_movie_metadata(self, movie: Movie) -> Dict[str, Any]:
         genres_str = ", ".join(movie.genres) if movie.genres else None
         return {
-            "id": movie.movie_id,
+            "movie_id": movie.movie_id,
             "title": movie.title,
             "genres": genres_str,
             "overview": movie.overview,
-            "image": movie.poster_path,
+            "poster_url": movie.poster_url or "",
+            "release_date": movie.release_date or "",
         }
 
     def index(self, movies: List[Movie]) -> None:
@@ -97,14 +99,14 @@ class MovieChromaIndexer:
                     )
                     text_metadatas.append(meta)
 
-            if movie.poster_path:
+            if movie.poster_url:
                 image_id = f"{movie.movie_id}_poster"
                 image_ids.append(image_id)
                 meta = dict(base_meta)
                 meta.update(
                     {
                         "image_id": image_id,
-                        "image_path": movie.poster_path,
+                        "image_url": movie.poster_url,
                     }
                 )
                 image_metadatas.append(meta)
@@ -124,7 +126,7 @@ class MovieChromaIndexer:
 
         if image_ids:
             print(f"[INFO] Embedding {len(image_metadatas)} poster images...")
-            image_paths = [m["image_path"] for m in image_metadatas]
+            image_paths = [m["image_url"] for m in image_metadatas]
             image_embeddings = self.image_embedder.embed_images_to_list(image_paths)
             print("[INFO] Adding poster images to Chroma collection 'movies_posters_images'...")
             self.movies_images.add(
@@ -200,7 +202,7 @@ class MovieChromaIndexer:
             )
         return hits
 
-    def search_images_by_image(self, image_path: str, k: int = 5) -> List[Dict[str, Any]]:
+    def search_images_by_image(self, image_path: str, k: int = 4) -> List[Dict[str, Any]]:
         """
         Similarity search over poster images using a provided local image path.
         """
@@ -243,14 +245,14 @@ class MovieChromaIndexer:
             res = self.movies_text.query(
                 query_embeddings=query_emb,
                 n_results=1,
-                where={"id": movie_id},
+                where={"movie_id": movie_id},
                 include=["documents", "distances"],
             )
             docs = res.get("documents", [[]])[0]
             return docs[0] if docs else None
 
         res = self.movies_text.get(
-            where={"id": movie_id},
+            where={"movie_id": movie_id},
             limit=1,
             include=["documents"],
         )
@@ -272,7 +274,7 @@ class MovieChromaIndexer:
 
         def add_hit(hit: Dict[str, Any]) -> None:
             meta = hit["metadata"] or {}
-            movie_id = meta.get("id")
+            movie_id = meta.get("movie_id")
             if not movie_id:
                 return
 
@@ -280,12 +282,13 @@ class MovieChromaIndexer:
             if entry is None:
                 genres_meta = meta.get("genres")
                 genres = [g.strip() for g in genres_meta.split(",")]
-                
+
                 entry = {
                     "id": movie_id,
                     "title": meta.get("title"),
                     "genres": genres,
                     "overview": meta.get("overview"),
+                    "release_date": meta.get("release_date"),
                     "image_paths": [],
                     "text_snippets": [],
                     "min_distance": hit["distance"],
@@ -307,7 +310,7 @@ class MovieChromaIndexer:
                 if snippet and snippet not in entry["text_snippets"]:
                     entry["text_snippets"].append(snippet)
 
-            image_path = meta.get("image_path") or meta.get("image")
+            image_path = meta.get("image_url") or meta.get("poster_url")
             if image_path and image_path not in entry["image_paths"]:
                 entry["image_paths"].append(image_path)
 
