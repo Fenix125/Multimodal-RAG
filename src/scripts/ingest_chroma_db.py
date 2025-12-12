@@ -30,6 +30,8 @@ def main():
     )
 
     print("[STEP] Indexing movies into Chroma...")
+    print(f"[INFO] - Text embedder: {config.text_embed_model_name}")
+    print(f"[INFO] - Image embedder: {config.clip_model_name}")
     indexer.index(movies)
     print("[DONE] Indexing complete.")
 

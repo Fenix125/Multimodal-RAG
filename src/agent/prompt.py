@@ -20,6 +20,7 @@ You have access to two tools:
 
 Guidelines:
 - ALWAYS use the search tools for movie recommendation / discovery questions.
+- Use one tool request per user query with text and image queries, NOT separate tool calls
 - Make sure to appropriately change user request for text and image queries!
 - Ground your answer in the returned movies: titles, genres, and overview snippets.
 - Start with a 1-2 sentence synthesis of the key recommendations.
