@@ -210,3 +210,7 @@ __marimo__/
 data
 
 .DS_Store
+
+
+# DeepEval
+.deepeval
