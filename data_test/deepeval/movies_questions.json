@@ -1,0 +1,146 @@
+[
+  {
+    "query": "I'm looking for the Spider-Man movie where Peter Parker asks Doctor Strange to make everyone forget his identity.",
+    "expected_answer": "That description matches “Spider-Man: No Way Home” (2021), where Peter Parker asks Doctor Strange to cast a spell so everyone forgets he is Spider-Man, and the spell goes wrong."
+  },
+  {
+    "query": "Show me all the Spider-Man movies from the Marvel Cinematic Universe.",
+    "expected_answer": "The Spider-Man movies that are part of the Marvel Cinematic Universe are: “Spider-Man: Homecoming” (2017), “Spider-Man: Far From Home” (2019), and “Spider-Man: No Way Home” (2021)."
+  },
+  {
+    "query": "Find the animated Spider-Verse movie about Miles Morales.",
+    "expected_answer": "The animated Spider-Verse movies about Miles Morales are “Spider-Man: Into the Spider-Verse” (2018) and its follow-up “Spider-Man: Across the Spider-Verse (Part One)” (2022), with the first film telling his origin story."
+  },
+  {
+    "query": "Recommend a dark, grounded Batman movie with a detective vibe.",
+    "expected_answer": "A strong match is “The Batman” (2022), a dark and grounded take that focuses heavily on Batman’s detective work and investigation of a serial killer in Gotham."
+  },
+  {
+    "query": "I want to watch the Avengers movie where they fight Thanos and half the universe disappears.",
+    "expected_answer": "You are looking for “Avengers: Infinity War” (2018), where the Avengers and their allies battle Thanos and he ultimately wipes out half of all life in the universe with the snap."
+  },
+  {
+    "query": "Find the Avengers movie that concludes the Infinity Saga and involves time travel to collect the Infinity Stones.",
+    "expected_answer": "That is “Avengers: Endgame” (2019), which concludes the Infinity Saga and follows the surviving heroes as they travel through time to recover the Infinity Stones and undo Thanos’s snap."
+  },
+  {
+    "query": "List all Avengers team-up movies.",
+    "expected_answer": "The main Avengers team-up movies are: “The Avengers” (2012), “Avengers: Age of Ultron” (2015), “Avengers: Infinity War” (2018), and “Avengers: Endgame” (2019)."
+  },
+  {
+    "query": "Give me the Lord of the Rings trilogy.",
+    "expected_answer": "The Lord of the Rings trilogy consists of: “The Lord of the Rings: The Fellowship of the Ring” (2001), “The Lord of the Rings: The Two Towers” (2002), and “The Lord of the Rings: The Return of the King” (2003)."
+  },
+  {
+    "query": "I'm looking for the Lord of the Rings movie where they destroy the One Ring at Mount Doom.",
+    "expected_answer": "That is “The Lord of the Rings: The Return of the King” (2003), where Frodo and Sam reach Mount Doom and the One Ring is finally destroyed."
+  },
+  {
+    "query": "Find the original Matrix movie from 1999.",
+    "expected_answer": "The original film is “The Matrix” (1999), the first movie in the Matrix series."
+  },
+  {
+    "query": "Show me all Matrix movies.",
+    "expected_answer": "The Matrix films in this series are: “The Matrix” (1999), “The Matrix Reloaded” (2003), “The Matrix Revolutions” (2003), and “The Matrix Resurrections” (2021)."
+  },
+  {
+    "query": "Recommend a Disney animated musical about a magical Colombian family whose house has powers.",
+    "expected_answer": "You are describing “Encanto” (2021), a Disney animated musical about the Madrigal family in Colombia, who each have magical gifts and live in an enchanted house."
+  },
+  {
+    "query": "I want a Pixar movie about a teenage girl who turns into a giant red panda when she gets too excited.",
+    "expected_answer": "That movie is “Turning Red” (2022), a Pixar film about a 13-year-old girl who transforms into a giant red panda whenever her emotions become overwhelming."
+  },
+  {
+    "query": "Looking for the Pixar movie set on the Italian Riviera about two sea monster boys.",
+    "expected_answer": "You’re thinking of “Luca” (2021), a Pixar movie set on the Italian Riviera about two young sea monsters who spend a summer exploring life on land."
+  },
+  {
+    "query": "Find the Pixar film where emotions like Joy and Sadness live inside a girl's mind.",
+    "expected_answer": "That is “Inside Out” (2015), which personifies emotions like Joy, Sadness, Anger, Fear, and Disgust living inside a young girl’s mind."
+  },
+  {
+    "query": "Recommend an animated film about a boy who travels to the Land of the Dead to become a musician.",
+    "expected_answer": "You are describing “Coco” (2017), an animated film about Miguel, a boy who journeys to the Land of the Dead to pursue his dream of becoming a musician."
+  },
+  {
+    "query": "Show me a Pixar movie about a middle school music teacher whose soul gets separated from his body.",
+    "expected_answer": "That movie is “Soul” (2020), a Pixar film about Joe Gardner, a middle school music teacher whose soul becomes separated from his body just as he gets his big break."
+  },
+  {
+    "query": "I want an animated Disney movie about two sisters, Elsa and Anna, with ice powers.",
+    "expected_answer": "The main film that matches this is “Frozen” (2013), the Disney animated movie about sisters Elsa and Anna, with Elsa struggling to control her ice powers."
+  },
+  {
+    "query": "What are the Frozen movies?",
+    "expected_answer": "The Frozen movies are “Frozen” (2013) and its sequel “Frozen II” (2019), both centered on the sisters Elsa and Anna and Elsa’s magical ice powers."
+  },
+  {
+    "query": "Recommend a Disney movie about a bunny cop teaming up with a con-artist fox in a city of animals.",
+    "expected_answer": "That description matches “Zootopia” (2016), where rookie bunny cop Judy Hopps teams up with con-artist fox Nick Wilde in a city of anthropomorphic animals."
+  },
+  {
+    "query": "Show me a heartwarming animated film about an old man who flies his house with balloons.",
+    "expected_answer": "You are looking for “Up” (2009), the Pixar film about Carl Fredricksen, an elderly widower who flies his house away using thousands of balloons."
+  },
+  {
+    "query": "List all Toy Story movies.",
+    "expected_answer": "The Toy Story movies are: “Toy Story” (1995), “Toy Story 2” (1999), “Toy Story 3” (2010), and “Toy Story 4” (2019)."
+  },
+  {
+    "query": "I'm looking for the Cars sequel where Lightning McQueen goes to the World Grand Prix and Mater becomes a spy.",
+    "expected_answer": "That film is “Cars 2” (2011), where Lightning McQueen races in the World Grand Prix and Mater is drawn into an international spy mission."
+  },
+  {
+    "query": "Find the Cars movie where Lightning McQueen is an older racer dealing with a new generation of high-tech cars.",
+    "expected_answer": "You’re describing “Cars 3” (2017), which focuses on an aging Lightning McQueen facing a new generation of faster, high-tech race cars."
+  },
+  {
+    "query": "I want to rewatch the first Harry Potter movie.",
+    "expected_answer": "The first film in the series is “Harry Potter and the Philosopher's Stone” (2001), which introduces Harry’s first year at Hogwarts."
+  },
+  {
+    "query": "Find the last Harry Potter movie where Harry faces Voldemort at Hogwarts for the final battle.",
+    "expected_answer": "That is “Harry Potter and the Deathly Hallows: Part 2” (2011), which ends with the final battle at Hogwarts between Harry and Voldemort."
+  },
+  {
+    "query": "Show me all Harry Potter movies.",
+    "expected_answer": "The Harry Potter movies in order are: “Harry Potter and the Philosopher's Stone”, “Harry Potter and the Chamber of Secrets”, “Harry Potter and the Prisoner of Azkaban”, “Harry Potter and the Goblet of Fire”, “Harry Potter and the Order of the Phoenix”, “Harry Potter and the Half-Blood Prince”, “Harry Potter and the Deathly Hallows: Part 1”, and “Harry Potter and the Deathly Hallows: Part 2”."
+  },
+  {
+    "query": "Find the Jurassic World movie where the dinosaur theme park is finally open to the public and then everything goes wrong.",
+    "expected_answer": "You are referring to “Jurassic World” (2015), which is set in a fully operational dinosaur theme park that quickly descends into chaos."
+  },
+  {
+    "query": "Show me all Jurassic World movies.",
+    "expected_answer": "The Jurassic World movies are: “Jurassic World” (2015), “Jurassic World: Fallen Kingdom” (2018), and “Jurassic World Dominion” (2022)."
+  },
+  {
+    "query": "List all Spider-Man movies.",
+    "expected_answer": "Key Spider-Man movies in this catalog include: “Spider-Man” (2002), “Spider-Man 3” (2007), “The Amazing Spider-Man” (2012), “The Amazing Spider-Man 2” (2014), “Spider-Man: Homecoming” (2017), “Spider-Man: Far From Home” (2019), “Spider-Man: No Way Home” (2021), “Spider-Man: Into the Spider-Verse” (2018), and “Spider-Man: Across the Spider-Verse (Part One)” (2022)."
+  },
+  {
+    "query": "I'm looking for the Spider-Man movie where Peter Parker goes on a school trip to Europe and fights Mysterio.",
+    "expected_answer": "That’s “Spider-Man: Far From Home” (2019), where Peter Parker goes on a school trip across Europe and battles Mysterio."
+  },
+  {
+    "query": "Find the Spider-Man reboot starring Andrew Garfield.",
+    "expected_answer": "The Spider-Man reboot starring Andrew Garfield begins with “The Amazing Spider-Man” (2012) and continues with its sequel “The Amazing Spider-Man 2” (2014)."
+  },
+  {
+    "query": "Recommend a science fiction movie about astronauts traveling through a wormhole to find a new home for humanity.",
+    "expected_answer": "You’re describing “Interstellar” (2014), a science fiction film about astronauts who travel through a wormhole in search of a new home for humanity."
+  },
+  {
+    "query": "I'm looking for the mind-bending heist movie where thieves enter people's dreams.",
+    "expected_answer": "That movie is “Inception” (2010), which follows a team of thieves who infiltrate people’s dreams to perform a high-stakes heist."
+  },
+  {
+    "query": "Find the classic prison drama about Andy Dufresne and his friendship with Red.",
+    "expected_answer": "You are referring to “The Shawshank Redemption” (1994), a prison drama about Andy Dufresne and his friendship with Red."
+  },
+  {
+    "query": "Recommend the classic mafia movie about the Corleone family.",
+    "expected_answer": "The classic mafia film about the Corleone family is “The Godfather” (1972)."
+  }
+]

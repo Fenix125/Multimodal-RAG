@@ -1,0 +1,502 @@
+[
+  {
+    "query": "I'm looking for the Spider-Man movie where Peter Parker asks Doctor Strange to make everyone forget his identity.",
+    "expected_relevant_movie_ids": [
+      "0"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "0",
+      "170",
+      "168",
+      "132",
+      "144"
+    ]
+  },
+  {
+    "query": "Show me all the Spider-Man movies from the Marvel Cinematic Universe.",
+    "expected_relevant_movie_ids": [
+      "168",
+      "144",
+      "0"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "170",
+      "168",
+      "191",
+      "201"
+    ]
+  },
+  {
+    "query": "Find the animated Spider-Verse movie about Miles Morales.",
+    "expected_relevant_movie_ids": [
+      "191",
+      "917"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "917",
+      "191",
+      "170",
+      "168",
+      "307"
+    ]
+  },
+  {
+    "query": "Recommend a dark, grounded Batman movie with a detective vibe.",
+    "expected_relevant_movie_ids": [
+      "1"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "605",
+      "559",
+      "653",
+      "109",
+      "221"
+    ]
+  },
+  {
+    "query": "I want to watch the Avengers movie where they fight Thanos and half the universe disappears.",
+    "expected_relevant_movie_ids": [
+      "71"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "171",
+      "71",
+      "254",
+      "280",
+      "1"
+    ]
+  },
+  {
+    "query": "Find the Avengers movie that concludes the Infinity Saga and involves time travel to collect the Infinity Stones.",
+    "expected_relevant_movie_ids": [
+      "171"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "71",
+      "171",
+      "280",
+      "254",
+      "337"
+    ]
+  },
+  {
+    "query": "List all Avengers team-up movies.",
+    "expected_relevant_movie_ids": [
+      "138",
+      "254",
+      "71",
+      "171"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "254",
+      "280",
+      "269",
+      "171",
+      "695"
+    ]
+  },
+  {
+    "query": "Give me the Lord of the Rings trilogy.",
+    "expected_relevant_movie_ids": [
+      "369",
+      "479",
+      "419"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "479",
+      "145",
+      "369",
+      "398",
+      "506"
+    ]
+  },
+  {
+    "query": "I'm looking for the Lord of the Rings movie where they destroy the One Ring at Mount Doom.",
+    "expected_relevant_movie_ids": [
+      "419"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "479",
+      "369",
+      "523",
+      "239",
+      "194"
+    ]
+  },
+  {
+    "query": "Find the original Matrix movie from 1999.",
+    "expected_relevant_movie_ids": [
+      "572"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "572",
+      "951",
+      "23",
+      "145",
+      "902"
+    ]
+  },
+  {
+    "query": "Show me all Matrix movies.",
+    "expected_relevant_movie_ids": [
+      "572",
+      "951",
+      "902",
+      "23"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "572",
+      "145",
+      "951",
+      "79",
+      "723"
+    ]
+  },
+  {
+    "query": "Recommend a Disney animated musical about a magical Colombian family whose house has powers.",
+    "expected_relevant_movie_ids": [
+      "3"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "3",
+      "46",
+      "506",
+      "805",
+      "769"
+    ]
+  },
+  {
+    "query": "I want a Pixar movie about a teenage girl who turns into a giant red panda when she gets too excited.",
+    "expected_relevant_movie_ids": [
+      "44"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "44",
+      "506",
+      "678",
+      "505",
+      "600"
+    ]
+  },
+  {
+    "query": "Looking for the Pixar movie set on the Italian Riviera about two sea monster boys.",
+    "expected_relevant_movie_ids": [
+      "54"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "54",
+      "853",
+      "187",
+      "524",
+      "374"
+    ]
+  },
+  {
+    "query": "Find the Pixar film where emotions like Joy and Sadness live inside a girl's mind.",
+    "expected_relevant_movie_ids": [
+      "475"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "475",
+      "732",
+      "311",
+      "853",
+      "680"
+    ]
+  },
+  {
+    "query": "Recommend an animated film about a boy who travels to the Land of the Dead to become a musician.",
+    "expected_relevant_movie_ids": [
+      "161"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "161",
+      "553",
+      "118",
+      "678",
+      "830"
+    ]
+  },
+  {
+    "query": "Show me a Pixar movie about a middle school music teacher whose soul gets separated from his body.",
+    "expected_relevant_movie_ids": [
+      "205"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "205",
+      "972",
+      "560",
+      "868",
+      "769"
+    ]
+  },
+  {
+    "query": "I want an animated Disney movie about two sisters, Elsa and Anna, with ice powers.",
+    "expected_relevant_movie_ids": [
+      "378",
+      "249"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "378",
+      "311",
+      "506",
+      "81",
+      "291"
+    ]
+  },
+  {
+    "query": "What are the Frozen movies?",
+    "expected_relevant_movie_ids": [
+      "378",
+      "249"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "145",
+      "46",
+      "311",
+      "81",
+      "378"
+    ]
+  },
+  {
+    "query": "Recommend a Disney movie about a bunny cop teaming up with a con-artist fox in a city of animals.",
+    "expected_relevant_movie_ids": [
+      "518"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "518",
+      "711",
+      "853",
+      "106",
+      "753"
+    ]
+  },
+  {
+    "query": "Show me a heartwarming animated film about an old man who flies his house with balloons.",
+    "expected_relevant_movie_ids": [
+      "483"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "46",
+      "853",
+      "615",
+      "553",
+      "483"
+    ]
+  },
+  {
+    "query": "List all Toy Story movies.",
+    "expected_relevant_movie_ids": [
+      "227",
+      "301",
+      "500",
+      "391"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "145",
+      "311",
+      "301",
+      "391",
+      "145"
+    ]
+  },
+  {
+    "query": "I'm looking for the Cars sequel where Lightning McQueen goes to the World Grand Prix and Mater becomes a spy.",
+    "expected_relevant_movie_ids": [
+      "317"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "317",
+      "576",
+      "200",
+      "853",
+      "396"
+    ]
+  },
+  {
+    "query": "Find the Cars movie where Lightning McQueen is an older racer dealing with a new generation of high-tech cars.",
+    "expected_relevant_movie_ids": [
+      "200"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "576",
+      "200",
+      "317",
+      "593"
+    ]
+  },
+  {
+    "query": "I want to rewatch the first Harry Potter movie.",
+    "expected_relevant_movie_ids": [
+      "137"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "137",
+      "192",
+      "253",
+      "245",
+      "137"
+    ]
+  },
+  {
+    "query": "Find the last Harry Potter movie where Harry faces Voldemort at Hogwarts for the final battle.",
+    "expected_relevant_movie_ids": [
+      "253"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "306",
+      "217",
+      "253",
+      "245",
+      "192"
+    ]
+  },
+  {
+    "query": "Show me all Harry Potter movies.",
+    "expected_relevant_movie_ids": [
+      "137",
+      "159",
+      "192",
+      "184",
+      "245",
+      "217",
+      "306",
+      "253"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "145",
+      "253",
+      "245",
+      "869",
+      "194"
+    ]
+  },
+  {
+    "query": "Find the Jurassic World movie where the dinosaur theme park is finally open to the public and then everything goes wrong.",
+    "expected_relevant_movie_ids": [
+      "432"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "432",
+      "675",
+      "388",
+      "14",
+      "219"
+    ]
+  },
+  {
+    "query": "Show me all Jurassic World movies.",
+    "expected_relevant_movie_ids": [
+      "432",
+      "388",
+      "402"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "432",
+      "790",
+      "388",
+      "635",
+      "219"
+    ]
+  },
+  {
+    "query": "List all Spider-Man movies.",
+    "expected_relevant_movie_ids": [
+      "170",
+      "201",
+      "168",
+      "144",
+      "0",
+      "90",
+      "132",
+      "191",
+      "917"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "170",
+      "145",
+      "201",
+      "191",
+      "723"
+    ]
+  },
+  {
+    "query": "I'm looking for the Spider-Man movie where Peter Parker goes on a school trip to Europe and fights Mysterio.",
+    "expected_relevant_movie_ids": [
+      "144"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "144",
+      "170",
+      "168",
+      "132",
+      "201"
+    ]
+  },
+  {
+    "query": "Find the Spider-Man reboot starring Andrew Garfield.",
+    "expected_relevant_movie_ids": [
+      "90",
+      "132"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "170",
+      "132",
+      "201",
+      "917",
+      "170"
+    ]
+  },
+  {
+    "query": "Recommend a science fiction movie about astronauts traveling through a wormhole to find a new home for humanity.",
+    "expected_relevant_movie_ids": [
+      "461"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "461",
+      "477",
+      "941",
+      "996",
+      "337"
+    ]
+  },
+  {
+    "query": "I'm looking for the mind-bending heist movie where thieves enter people's dreams.",
+    "expected_relevant_movie_ids": [
+      "380"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "404",
+      "821",
+      "685",
+      "380",
+      "877"
+    ]
+  },
+  {
+    "query": "Find the classic prison drama about Andy Dufresne and his friendship with Red.",
+    "expected_relevant_movie_ids": [
+      "657"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "657",
+      "853",
+      "731",
+      "750",
+      "273"
+    ]
+  },
+  {
+    "query": "Recommend the classic mafia movie about the Corleone family.",
+    "expected_relevant_movie_ids": [
+      "609"
+    ],
+    "retrieved_relevant_movie_ids": [
+      "609",
+      "481",
+      "86",
+      "105",
+      "122"
+    ]
+  }
+]
