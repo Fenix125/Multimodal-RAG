@@ -1,195 +1,243 @@
-# Multimodal-RAG
+# Multimodal RAG for Movie Search & Recommendation
 
-start chat: python3 -m agent.chat
+> Retrieval-Augmented Generation System with Text + Image Understanding
 
-## Dataset
-
-load dataset: python3 -m agent.preprocess_data
-
-
-# Multimodal RAG for Movie Search & Recommendation  
-## Retrieval-Augmented Generation System with Text + Image Understanding  
-### Team 2 — Authors: **Mykhailo Ivasiuk**, **Maksym Dzoban**
+Authors: [**Mykhailo Ivasiuk**](https://github.com/Fenix125), [**Maksym Dzoban**](https://github.com/MaxDzioban)
 
 ## Overview
-In this NLP course project we implemented a Multimodal Retrieval-Augmented Generation (RAG) system for movie discovery.  
+
+In this project we implemented a Multimodal Retrieval-Augmented Generation (RAG) system for movie discovery.  
 Users can search for movies using:
 
-- Text descriptions (plot, mood, genre, atmosphere)  
-- Poster style descriptions (colors, layout, visual mood)  
-- Actual poster images (image-to-image similarity search)  
-- Combined multimodal queries (text + poster style)
+-   Text descriptions (plot, mood, genre, atmosphere)
+-   Poster style descriptions (colors, layout, visual mood)
+-   Actual poster images (image-to-image similarity search)
+-   Combined multimodal queries (text + poster style)
 
-The system retrieves relevant movies from a vector database ChromaDB and uses an LLM agent to produce final recommendations.
+The system retrieves relevant movies from a ChromaDB vector database and uses an LLM agent to produce final recommendations.
 
 ## Motivation
+
 Traditional movie recommenders rely only on text metadata, but movie posters also contain rich semantic information:
 
-- Mood, color palette  
-- Genre cues  
-- Visual style, composition  
+-   Mood, color palette
+-   Genre cues
+-   Visual style, composition
 
-Users often think visually (e.g., _“a dark neon cyberpunk vibe”_, _“a pastel cozy romance poster”_).  
+Users often think visually (e.g., _“a dark neon cyberpunk vibe”_, _“a pastel cozy romance poster”_).
 
 Goals of the project:
 
-- Support text-based search  
-- Support poster-style search (image or textual description)  
-- Enable unified multimodal retrieval  
+-   Support text-based search
+-   Support poster-style search (image or textual description)
+-   Enable unified multimodal retrieval
 
 ## System Architecture
+
 The system consists of three main parts:
 
-#### 1. Dataset Ingestion & Preprocessing
-- Load movie dataset (metadata + posters)  
-- Filter incomplete/bad records  
-- Chunk overview text  
-- Generate text embeddings (E5 / MPNet)  
-- Generate image embeddings (CLIP)  
-- Save cleaned JSONL + poster images  
+### 1. Dataset Ingestion & Preprocessing
 
-#### 2. Vector Indexing (ChromaDB)
+-   Load movie dataset (metadata + posters)
+-   Filter incomplete/bad records
+-   Save cleaned JSONL + poster images
+
+### 2. Vector Indexing (ChromaDB)
+
 Two vector collections are used:
 
-| Collection                | Contents                                 | Purpose                     |
-|--------------------------|--------------------------------------------|-----------------------------|
-| `movies_overviews_text` | chunks of movie overviews + metadata       | text semantic search        |
-| `movies_posters_images` | CLIP image embeddings + poster metadata    | poster similarity search    |
+| Collection              | Contents                                | Purpose                  |
+| ----------------------- | --------------------------------------- | ------------------------ |
+| `movies_overviews_text` | chunks of movies description + metadata | text semantic search     |
+| `movies_posters_images` | images + poster metadata                | poster similarity search |
 
-### 3. LLM Agent (LangChain)
+### 3. LLM Agent
+
 The agent uses two custom tools:
 
-- **movie_multimodal_search** — unified text + image search  
-- **image_search** — poster-based similarity  
+-   **movie_multimodal_search** — unified text + image search
+-   **image_search** — poster-based similarity
 
-The agent merges results, deduplicates entries, enriches metadata, and produces the final RAG answer.
-
+The tools merge results, deduplicates entries and produces the final RAG answer.
 
 ---
 
-## Text Embeddings
+### Text Embeddings
+
 We use models such as E5-base for superior retrieval quality.
 
 Supported models:
 
-- `sentence-transformers/all-mpnet-base-v2`
-- `intfloat/multilingual-e5-base`
-- `intfloat/multilingual-e5-large`
+-   `sentence-transformers/all-mpnet-base-v2`
+-   `intfloat/multilingual-e5-base`
+-   `intfloat/multilingual-e5-large`
 
-**Pipeline:**
-1. Accept string or list  
-2. Convert to list  
-3. For E5 models:  
-   - Queries → `"query: ..."`  
-   - Documents → `"passage: ..."`  
-4. Encode with SentenceTransformers  
-5. L2-normalize  
-6. Return embeddings for ChromaDB  
+### Image Embeddings (CLIP)
 
----
-
-## Image Embeddings (CLIP)
 Vision models:
 
-- `openai/clip-vit-base-patch32`
-- `openai/clip-vit-base-patch16`
-
-**Pipeline:**
-1. Load image (path/URL → PIL RGB)  
-2. Resize, crop, normalize  
-3. Encode via CLIP Vision Transformer  
-4. Extract embedding  
-5. L2-normalize  
-6. Store in vector DB  
-
----
+-   `openai/clip-vit-base-patch32`
+-   `openai/clip-vit-base-patch16`
 
 ## Retrieval Tools
 
 ### **Movie Multimodal Search Tool**
-Accepts:  
-- `text_query` (plot/mood/genre description)  
-- `image_query` (poster style text)  
 
-Performs:  
-- Text search (E5)  
-- Poster-style search (CLIP text encoder)  
-- Merging & ranking  
-- Deduplication  
-- JSON output  
+Accepts:
+
+-   `text_query` (plot/mood/genre description)
+-   `image_query` (poster style text)
+
+Performs:
+
+-   Text search
+-   Poster-style search
+-   Merging
+-   Deduplication
+-   Output
 
 ### **Image Search Tool**
-Accepts:  
-- `image_path` (local uploaded poster)
 
-Processes:  
-- Load → preprocess  
-- CLIP embedding extraction  
-- KNN search in poster collection  
-- Return movie metadata  
+Accepts:
+
+-   `image_path` (local file)
+
+Processes:
+
+-   Image embedding creation
+-   Vector Store Search
 
 ---
 
 ## LLM Agent
+
 Built using **LangChain**:
 
-- Configurable provider (OpenAI / Gemini)  
-- Custom system prompt  
-- Produces RAG-based final answers  
-
----
-
-## 🐳 Running with Docker
-```bash
-docker-compose up --build
-```
-
-Or manually:
-```
-docker build -t multimodal-rag .
-docker run -p 8000:8000 multimodal-rag
-```
+-   Configurable provider (OpenAI / Google API)
+-   Custom system prompt
+-   Produces RAG-based final answers
 
 ---
 
 ### Systems Requirements
 
-- Python: 3.11 (required)
-- OS: MacOS/ Linux
+-   Python: 3.12
 
 Create and activate a virtual environment
 
 ```
-python3.11 -m venv .venv
+python -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
-pip install deepeval
 ```
 
-Create a .env file (or export variables manually):
+#### Environment Variables:
 
-```
-OPENAI_API_KEY=your_openai_api_key_here
+#optional
 
-```
+-   `GEMINI_MODEL`=gemini-2.5-flash
+-   `OPENAI_MODEL`=gpt-4o-mini
+-   `TEXT_EMBED_MODEL`=intfloat/multilingual-e5-base
+-   `CLIP_MODEL`=openai/clip-vit-base-patch32
+-   `CHROMA_PATH`=data/chroma
+-   `STREAMLIT_PORT`=9000
+
+#necessary (one of, if both provided uses google api by default)
+
+-   `GOOGLE_AI_API_KEY`=your_api_key_here
+-   `OPENAI_API_KEY`=your_api_key_here
+
+> [!IMPORTANT]
+> Make sure at least GOOGLE_AI_API_KEY is set - without it the agent won't work
+
+> [!NOTE]
+> All articles and the Chroma db are stored locally under `CHROMA_PATH`
 
 ## Run:
 
-Preprocess dataset
+Option A - Let the UI handle ingestion
 
-```
-python3 -m src.scripts.preprocess_movies
-```
+Start Streamlit:
 
-Output:
-
-```
-data/processed/movies.jsonl
+```shell
+streamlit run app.py
 ```
 
-Ingest data into ChromaDB:
+-   Open the app in your browser (usually http://localhost:8501).
+-   Go to the Settings tab in the sidebar.
+-   Click “Rebuild movie index” then “Yes, rebuild”.
 
+This will:
+
+-   Download the dataset
+-   Build text + image embeddings.
+-   Store everything in Chroma under `CHROMA_PATH`
+
+Switch back to Chat and start asking questions!
+
+Option B - Ingest via CLI scripts:
+
+```shell
+# 1. Fetch raw data into data/processed/movies.jsonl
+python -m src.scripts.preprocess_movies
+
+# 2. Build text + image embeddings and write to Chroma
+python -m src.scripts.ingest_chroma_db
+
+# 3. Run the Streamlit app
+streamlit run app.py
 ```
-python3 -m src.scripts.ingest_chroma_db
+
+Optional: Docker Deployment
+
+Run with Docker:
+
+```shell
+docker compose up --build
 ```
+
+Useful commands:
+
+```shell
+docker compose stop      # stop containers
+docker compose start     # start them again
+docker compose down      # stop + remove containers
+```
+
+> [!NOTE]
+> The app-data volume keeps your Chroma DB between restarts,
+> so you don’t repeatedly re-download and re-embed everything.
+
+
+## Evaluation (Optional)
+
+If you want to reproduce the evaluation:
+
+1. src/scripts/evaluate_movies_rag.py:
+   Runs the agent over a dataset in data_test/metrics
+   Computes Recall@K, Precision@K, MRR, Hit@K
+   Writes \*\_with_results.json and prints a small table
+2. src/scripts/evaluate_rag_deepeval.py
+   Works on dataset in data_test/deepeval
+   Uses DeepEval to compute:
+    - ContextualRecall
+    - ContextualRelevancy
+    - AnswerRelevancy
+    - Faithfulness
+
+
+> [!NOTE]
+> You will need to setup `OPENAI_API_KEY` to use DeepEval evaluation
+
+```shell
+python -m src.scripts.evaluate_movies_rag --help
+python -m src.scripts.evaluate_rag_deepeval --help
+```
+
+(See each script’s --help for exact arguments.)
+
+## License
+
+This project is open-sourced.
+See the LICENSE file in the repository for full details.
