@@ -10,7 +10,7 @@ def main():
     print("[STEP] Ingesting movies and saving JSONL + posters...")
     ingest_movies_to_jsonl(
         output_path=MOVIES_JSONL_PATH,
-        sample_size=3000,
+        sample_size=1000,
         min_overview_len=20,
     )
     print("[DONE] Preprocessing complete.")
