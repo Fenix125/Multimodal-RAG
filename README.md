@@ -113,7 +113,7 @@ Processes:
 
 Built using **LangChain**:
 
--   Configurable provider (OpenAI / Gemini)
+-   Configurable provider (OpenAI / Google API)
 -   Custom system prompt
 -   Produces RAG-based final answers
 
@@ -149,7 +149,7 @@ pip install -r requirements.txt
 -   `OPENAI_API_KEY`=your_api_key_here
 
 > [!IMPORTANT]
-> Make sure at least GEMINI_API_KEY is set - without it the agent won't work
+> Make sure at least GOOGLE_AI_API_KEY is set - without it the agent won't work
 
 > [!NOTE]
 > All articles and the Chroma db are stored locally under `CHROMA_PATH`
